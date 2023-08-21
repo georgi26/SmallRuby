@@ -10,7 +10,7 @@ require 'racc/parser.rb'
 module SR
   class Parser < Racc::Parser
 
-module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 29)
+module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 38)
     def parse(tokens)
         @tokens = tokens
         do_parse
@@ -23,57 +23,69 @@ module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 29
 ##### State transition tables begin ###
 
 racc_action_table = [
-     2,     2,     2,     7,     7,     7,    16,     8,     8,     8,
-     2,    22,     2,     7,     3,    21,     4,     8,    25,    26,
-     5,    12,    13,    14,    19,    23,    27,    28 ]
+     2,     9,     2,     7,     3,     2,     9,     8,     7,    28,
+    14,    15,     8,    27,     4,    14,    15,     2,     9,     5,
+     7,    21,     2,     9,     8,     7,    16,    14,    15,     8,
+    32,    33,    14,    15,    17,    18,    19,    24,    25,    29,
+    31,    34,    35,    36 ]
 
 racc_action_check = [
-     4,    13,    14,     4,    13,    14,    14,     4,    13,    14,
-    18,    16,     0,    18,     1,    16,     2,    18,    20,    20,
-     3,     6,     7,     8,    15,    17,    24,    26 ]
+     4,     4,     0,     4,     1,    17,    17,     4,    17,    21,
+     4,     4,    17,    21,     2,    17,    17,    18,    18,     3,
+    18,    18,    23,    23,    18,    23,     6,    18,    18,    23,
+    26,    26,    23,    23,     7,     8,     9,    19,    20,    22,
+    24,    30,    31,    33 ]
 
 racc_action_pointer = [
-    10,    14,    13,    20,    -2,   nil,    17,    19,    20,   nil,
-   nil,   nil,   nil,    -1,     0,    20,     8,    21,     8,   nil,
-    11,   nil,   nil,   nil,    22,   nil,    24,   nil,   nil ]
+     0,     4,    11,    19,    -2,   nil,    22,    31,    32,    26,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,     3,    15,    34,
+    34,     6,    35,    20,    34,   nil,    23,   nil,   nil,   nil,
+    37,    35,   nil,    40,   nil,   nil,   nil ]
 
 racc_action_default = [
-   -13,   -13,   -13,   -13,   -12,    29,   -13,   -13,   -13,    -9,
-   -10,   -11,    -1,   -12,   -12,   -13,   -13,   -13,   -12,    -2,
-   -13,    -4,    -5,    -7,   -13,    -3,   -13,    -8,    -6 ]
+   -19,   -19,   -19,   -19,   -18,    37,   -19,   -19,   -19,   -19,
+   -12,   -13,   -14,   -15,   -16,   -17,    -1,   -18,   -18,   -19,
+   -19,   -19,   -19,   -18,    -9,    -2,   -19,    -4,    -5,    -7,
+   -19,   -19,    -3,   -19,    -8,   -10,    -6 ]
 
 racc_goto_table = [
-     6,     1,    18,    20,   nil,   nil,   nil,   nil,   nil,    15,
-    17,   nil,   nil,   nil,    24 ]
+     6,     1,    23,    26,   nil,   nil,   nil,   nil,   nil,   nil,
+   nil,   nil,   nil,    20,    22,   nil,   nil,   nil,   nil,    30 ]
 
 racc_goto_check = [
-     2,     1,     4,     5,   nil,   nil,   nil,   nil,   nil,     2,
-     2,   nil,   nil,   nil,     2 ]
+     2,     1,     4,     5,   nil,   nil,   nil,   nil,   nil,   nil,
+   nil,   nil,   nil,     2,     2,   nil,   nil,   nil,   nil,     2 ]
 
 racc_goto_pointer = [
-   nil,     1,    -4,   nil,   -12,   -13,   nil ]
+   nil,     1,    -4,   nil,   -16,   -18,   nil,   nil,   nil ]
 
 racc_goto_default = [
-   nil,     9,   nil,    10,   nil,   nil,    11 ]
+   nil,    10,   nil,    11,   nil,   nil,    12,    13,   nil ]
 
 racc_reduce_table = [
   0, 0, :racc_error,
-  4, 11, :_reduce_1,
-  4, 13, :_reduce_2,
-  3, 14, :_reduce_3,
-  2, 14, :_reduce_4,
-  1, 15, :_reduce_5,
-  3, 15, :_reduce_6,
-  4, 16, :_reduce_7,
-  5, 16, :_reduce_8,
-  1, 12, :_reduce_none,
-  1, 12, :_reduce_none,
-  1, 12, :_reduce_none,
-  0, 12, :_reduce_12 ]
+  4, 15, :_reduce_1,
+  4, 17, :_reduce_2,
+  3, 18, :_reduce_3,
+  2, 18, :_reduce_4,
+  1, 19, :_reduce_5,
+  3, 19, :_reduce_6,
+  4, 20, :_reduce_7,
+  5, 20, :_reduce_8,
+  3, 21, :_reduce_9,
+  5, 21, :_reduce_10,
+  3, 22, :_reduce_11,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  1, 16, :_reduce_none,
+  0, 16, :_reduce_18 ]
 
-racc_reduce_n = 13
+racc_reduce_n = 19
 
-racc_shift_n = 29
+racc_shift_n = 37
 
 racc_token_table = {
   false => 0,
@@ -85,9 +97,13 @@ racc_token_table = {
   "(" => 6,
   ")" => 7,
   "," => 8,
-  "def" => 9 }
+  "def" => 9,
+  "." => 10,
+  "=" => 11,
+  :NUMBER => 12,
+  :STRING => 13 }
 
-racc_nt_base = 10
+racc_nt_base = 14
 
 racc_use_result_var = true
 
@@ -119,13 +135,19 @@ Racc_token_to_s_table = [
   "\")\"",
   "\",\"",
   "\"def\"",
+  "\".\"",
+  "\"=\"",
+  "NUMBER",
+  "STRING",
   "$start",
   "module",
   "exp",
   "class",
   "args",
   "argsList",
-  "def" ]
+  "def",
+  "send",
+  "assign" ]
 Ractor.make_shareable(Racc_token_to_s_table) if defined?(Ractor)
 
 Racc_debug_parser = false
@@ -150,7 +172,7 @@ module_eval(<<'.,.,', 'SmallRubyParser.y', 5)
 
 module_eval(<<'.,.,', 'SmallRubyParser.y', 7)
   def _reduce_3(val, _values, result)
-    result = [val[1]]
+    result = val[1]
     result
   end
 .,.,
@@ -190,14 +212,41 @@ module_eval(<<'.,.,', 'SmallRubyParser.y', 17)
   end
 .,.,
 
-# reduce 9 omitted
+module_eval(<<'.,.,', 'SmallRubyParser.y', 19)
+  def _reduce_9(val, _values, result)
+     result = [:send,val[0],val[2]]
+    result
+  end
+.,.,
 
-# reduce 10 omitted
-
-# reduce 11 omitted
+module_eval(<<'.,.,', 'SmallRubyParser.y', 21)
+  def _reduce_10(val, _values, result)
+     result = [:send,val[0],val[2]]
+    result
+  end
+.,.,
 
 module_eval(<<'.,.,', 'SmallRubyParser.y', 23)
-  def _reduce_12(val, _values, result)
+  def _reduce_11(val, _values, result)
+    result = [:assign,val[0],val[2]]
+    result
+  end
+.,.,
+
+# reduce 12 omitted
+
+# reduce 13 omitted
+
+# reduce 14 omitted
+
+# reduce 15 omitted
+
+# reduce 16 omitted
+
+# reduce 17 omitted
+
+module_eval(<<'.,.,', 'SmallRubyParser.y', 32)
+  def _reduce_18(val, _values, result)
     result = []
     result
   end

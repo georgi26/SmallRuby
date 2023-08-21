@@ -24,12 +24,23 @@ describe "SmallParser" do
   end
   describe "Wen need parser for method definition" do
     before do
-      @src = "module TestModule class TestClass def testMethod(x , y)  
+      @src = "module TestModule class TestClass def testMethod(x,y)  
       end end end"
     end
     it "must parse module with class with method inside " do
       result = SR.parse(@src)
-      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", [["x", "y"]], []]]], result
+      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], []]]], result
+    end
+  end
+  describe "Wen need to parse expression" do
+    before do
+      @src = "module TestModule class TestClass def testMethod(x,y)
+        x.hi
+      end end end"
+    end
+    it "must parse module with class with method inside and send hi on x " do
+      result = SR.parse(@src)
+      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [:send, "x", "hi"]]]], result
     end
   end
 end

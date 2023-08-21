@@ -27,4 +27,19 @@ describe SR::Tokenizer do
                     ["(", "("], [:CONST, "x"], [",", ","], [:CONST, "y"], [")", ")"]], result
     end
   end
+
+  describe "When code with Strings and Numbers are given" do
+    before do
+      @src = " testStringVar=\"MyString\" testIntVariable=9989 testFloatVariable=3.14"
+    end
+    it "must crete String and 2 Number tokens" do
+      result = SR.tokens(@src)
+      assert_equal [[:CONST, "testStringVar"], ["=", "="],
+                    [:STRING, "MyString"],
+                    [:CONST, "testIntVariable"],
+                    ["=", "="], [:NUMBER, 9989],
+                    [:CONST, "testFloatVariable"], ["=", "="],
+                    [:NUMBER, 3.14]], result
+    end
+  end
 end
