@@ -32,7 +32,7 @@ describe "SmallParser" do
       assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], []]]], result
     end
   end
-  describe "Wen need to parse expression" do
+  describe "Wen need to parse send expression" do
     before do
       @src = "module TestModule class TestClass def testMethod(x,y)
         x.hi
@@ -41,6 +41,19 @@ describe "SmallParser" do
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
       assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [:send, "x", "hi"]]]], result
+    end
+  end
+
+  describe "Wen need to parse send expression with parameters" do
+    before do
+      @src = " module Test
+        x.hi(y,\"Gosh\",67)
+    end
+    "
+    end
+    it "must parse send hi on x " do
+      result = SR.parse(@src)
+      assert_equal [:module, "Test", [:send, "x", "hi", ["y", [:string, "Gosh"], [:number, 67]]]], result
     end
   end
 end
