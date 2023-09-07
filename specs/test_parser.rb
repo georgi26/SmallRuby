@@ -1,8 +1,9 @@
 describe "SmallParser" do
   describe "We need simple parser that can parse module" do
     before do
-      @src = "module MyTestModule  
-   end"
+      @src = "
+      module MyTestModule  
+      end"
     end
 
     it "Has to parse correct s-expression for module with name MyTestModule" do
@@ -13,8 +14,10 @@ describe "SmallParser" do
 
   describe "We need parser that can parse module with class inside" do
     before do
-      @src = "module MyTestModule  
-        class MyTestClass end
+      @src = "
+      module MyTestModule  
+        class MyTestClass 
+        end
       end"
     end
     it "Has to parse module with class inside " do
@@ -34,9 +37,14 @@ describe "SmallParser" do
   end
   describe "Wen need to parse send expression" do
     before do
-      @src = "module TestModule class TestClass def testMethod(x,y)
-        x.hi
-      end end end"
+      @src = "
+      module TestModule 
+        class TestClass 
+          def testMethod(x,y)
+            x.hi
+          end 
+        end 
+      end"
     end
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
@@ -44,16 +52,45 @@ describe "SmallParser" do
     end
   end
 
+  describe "Wen need to parse send expression with 1 parameter" do
+    before do
+      @src = " 
+      module Test
+        x.hi(67)
+      end
+      "
+    end
+    it "must parse send hi on x " do
+      result = SR.parse(@src)
+      assert_equal [:module, "Test", [:send, "x", "hi", [[:number, 67]]]], result
+    end
+  end
+
   describe "Wen need to parse send expression with parameters" do
     before do
-      @src = " module Test
+      @src = " 
+      module Test
         x.hi(y,\"Gosh\",67)
-    end
-    "
+      end
+      "
     end
     it "must parse send hi on x " do
       result = SR.parse(@src)
       assert_equal [:module, "Test", [:send, "x", "hi", ["y", [:string, "Gosh"], [:number, 67]]]], result
     end
   end
+  # describe "We need to do while loop" do
+  #   before do
+  #     @src = "
+  #     module Test
+  #        ( T.>(0) ).while
+  #     end
+  #     "
+  #   end
+  #   it "Must parse while loop as send operations  " do
+  #     puts SR.tokens(@src)
+  #     result = SR.parse(@src)
+  #     assert_equal [:module, "Test", [:send, "x", "hi", ["y", [:string, "Gosh"], [:number, 67]]]], result
+  #   end
+  # end
 end

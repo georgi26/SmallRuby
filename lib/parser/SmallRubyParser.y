@@ -25,11 +25,11 @@ class SR::Parser
               | 'def' CONST args exp 'end'
                     {result = [:def,val[1],val[2],val[3]]}
         
-        send: CONST '.' CONST
+        send: exp '.' CONST
             { result = [:send,val[0],val[2]]}
-            | CONST '.' CONST '('')'
+            | exp '.' CONST '('')'
             { result = [:send,val[0],val[2]]}
-            | CONST '.' CONST '(' expList ')'
+            | exp '.' CONST '(' expList ')'
             { result = [:send,val[0],val[2],val[4]]}
 
          expList: exp 
@@ -40,6 +40,7 @@ class SR::Parser
         assign: CONST '=' exp
             {result = [:assign,val[0],val[2]]}
         
+
        
         
         exp: module
@@ -49,6 +50,8 @@ class SR::Parser
             | number
             | string
             | CONST
+            | '(' exp ')'
+             { result=[:brackets,val[1]]}
             |
             {result = []}
              

@@ -1,7 +1,8 @@
 module SR
   class Tokenizer
     KEYWORDS = ["module", "class", "def", "end"]
-    OPERATORS = ["==", "=", ",", "(", ")", "+", "-", "*", "/", "."]
+    OPERATORS = ["=", ",", "(", ")", "."]
+    SEND_OPERATORS = ["==", ">=", "<=", ">", "<", "+", "-", "*", "/"]
     CONST = :CONST
     NUMBER = :NUMBER
     STRING = :STRING
@@ -28,9 +29,9 @@ module SR
         return
       elsif parseNumber(token)
         return
-      elsif (OPERATORS.index(token))
-        @result.push([token, token])
       elsif (parseTokenWithOperators(token))
+        return
+      elsif (token.size == 0)
         return
       else
         @result.push([CONST, token])
@@ -60,6 +61,10 @@ module SR
     end
 
     def parseTokenWithOperators(token)
+      if (OPERATORS.index(token))
+        @result.push([token, token])
+        return true
+      end
       OPERATORS.each do |op|
         if (token.index(op))
           tokens = token.split(op)
@@ -70,7 +75,9 @@ module SR
             if (i > 0)
               @result.push([op, op])
             end
+            puts "#{token}---#{op}====#{t}"
             parseToken(t)
+            puts(@result.join(","))
           end
           if (token.end_with?(op))
             @result.push([op, op])

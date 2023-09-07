@@ -10,7 +10,7 @@ require 'racc/parser.rb'
 module SR
   class Parser < Racc::Parser
 
-module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 58)
+module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 61)
     def parse(tokens)
         @tokens = tokens
         do_parse
@@ -23,53 +23,61 @@ module_eval(<<'...end SmallRubyParser.y/module_eval...', 'SmallRubyParser.y', 58
 ##### State transition tables begin ###
 
 racc_action_table = [
-     2,    11,     2,     7,     8,     9,     3,     2,    11,    10,
-     7,     8,     9,     4,     2,    11,    10,     7,     8,     9,
-    23,     2,    11,    10,     7,     8,     9,     5,     2,    11,
-    10,     7,     8,     9,    30,    37,    18,    10,     2,    11,
-    29,     7,     8,     9,    34,    35,    19,    10,    41,    42,
-    20,    21,    26,    27,    31,    33,    36,    40 ]
+     2,    17,     2,     7,     8,     9,    18,     2,    17,    10,
+     7,     8,     9,    18,     2,    17,    10,     7,     8,     9,
+    18,     2,    17,    10,     7,     8,     9,    26,     2,    34,
+    10,     7,     8,     9,    18,    33,     3,    10,     2,    17,
+     4,     7,     8,     9,    18,     2,    17,    10,     7,     8,
+     9,    18,    38,     5,    10,     2,    17,    19,     7,     8,
+     9,    18,    31,    35,    10,    20,    42,    40,    41,    29,
+    20,    20,    20,    21,    20,    43,    44,    22,    24,    30,
+   -23,    20,    45,    20 ]
 
 racc_action_check = [
-     4,     4,     0,     4,     4,     4,     1,    19,    19,     4,
-    19,    19,    19,     2,    20,    20,    19,    20,    20,    20,
-    20,    25,    25,    20,    25,    25,    25,     3,    33,    33,
-    25,    33,    33,    33,    23,    33,     6,    33,    42,    42,
-    23,    42,    42,    42,    28,    28,     7,    42,    38,    38,
-    10,    11,    21,    22,    24,    26,    32,    35 ]
+     4,     4,     0,     4,     4,     4,     4,    18,    18,     4,
+    18,    18,    18,    18,    21,    21,    18,    21,    21,    21,
+    21,    22,    22,    21,    22,    22,    22,    22,    26,    26,
+    22,    26,    26,    26,    26,    26,     1,    26,    28,    28,
+     2,    28,    28,    28,    28,    30,    30,    28,    30,    30,
+    30,    30,    30,     3,    30,    44,    44,     6,    44,    44,
+    44,    44,    25,    27,    44,     6,    36,    32,    32,    23,
+    25,    27,    23,     7,    36,    39,    39,    10,    20,    24,
+    34,    37,    41,    46 ]
 
 racc_action_pointer = [
-     0,     6,    10,    27,    -2,   nil,    32,    43,   nil,   nil,
-    47,    39,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     5,
-    12,    49,    49,    31,    50,    19,    47,   nil,    35,   nil,
-   nil,   nil,    52,    26,   nil,    54,   nil,   nil,    39,   nil,
-   nil,   nil,    36,   nil ]
+     0,    36,    37,    53,    -2,   nil,    53,    70,   nil,   nil,
+    74,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     5,   nil,
+    75,    12,    19,    60,    71,    58,    26,    59,    36,   nil,
+    43,   nil,    58,   nil,    68,   nil,    62,    69,   nil,    66,
+   nil,    79,   nil,   nil,    53,   nil,    71 ]
 
 racc_action_default = [
-   -25,   -25,   -25,   -25,   -24,    44,   -25,   -25,    -3,    -4,
-   -25,   -23,   -17,   -18,   -19,   -20,   -21,   -22,    -1,   -24,
-   -24,   -25,   -25,   -25,   -25,   -24,   -11,    -2,   -25,    -6,
-    -7,    -9,   -25,   -24,    -5,   -25,   -10,   -12,   -25,   -14,
-    -8,   -13,   -24,   -15 ]
+   -26,   -26,   -26,   -26,   -25,    47,   -26,   -26,    -3,    -4,
+   -26,   -17,   -18,   -19,   -20,   -21,   -22,   -23,   -25,    -1,
+   -26,   -25,   -25,   -26,   -11,   -26,   -25,   -26,   -25,   -24,
+   -25,    -2,   -26,    -6,    -7,    -9,   -26,   -14,   -12,   -26,
+    -5,   -26,   -10,   -13,   -25,    -8,   -15 ]
 
 racc_goto_table = [
-     6,     1,    25,    28,    38,   nil,   nil,   nil,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,    22,    24,   nil,   nil,   nil,
-   nil,    32,   nil,   nil,   nil,   nil,   nil,   nil,   nil,    39,
-   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,    43 ]
+     6,     1,    28,    32,    39,   nil,   nil,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,    25,    27,   nil,
+   nil,   nil,   nil,   nil,    36,   nil,    37,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
+    46 ]
 
 racc_goto_check = [
      2,     1,     6,     7,    10,   nil,   nil,   nil,   nil,   nil,
-   nil,   nil,   nil,   nil,   nil,     2,     2,   nil,   nil,   nil,
-   nil,     2,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     2,
-   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,     2 ]
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,     2,     2,   nil,
+   nil,   nil,   nil,   nil,     2,   nil,     2,   nil,   nil,   nil,
+   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,   nil,
+     2 ]
 
 racc_goto_pointer = [
-   nil,     1,    -4,   nil,   nil,   nil,   -18,   -20,   nil,   nil,
-   -29,   nil ]
+   nil,     1,    -4,   nil,   nil,   nil,   -20,   -23,   nil,   nil,
+   -26,   nil ]
 
 racc_goto_default = [
-   nil,    12,   nil,    13,    17,    16,   nil,   nil,    14,    15,
+   nil,    11,    23,    12,    16,    15,   nil,   nil,    13,    14,
    nil,   nil ]
 
 racc_reduce_table = [
@@ -97,11 +105,12 @@ racc_reduce_table = [
   1, 16, :_reduce_none,
   1, 16, :_reduce_none,
   1, 16, :_reduce_none,
-  0, 16, :_reduce_24 ]
+  3, 16, :_reduce_24,
+  0, 16, :_reduce_25 ]
 
-racc_reduce_n = 25
+racc_reduce_n = 26
 
-racc_shift_n = 44
+racc_shift_n = 47
 
 racc_token_table = {
   false => 0,
@@ -301,8 +310,15 @@ module_eval(<<'.,.,', 'SmallRubyParser.y', 40)
 
 # reduce 23 omitted
 
-module_eval(<<'.,.,', 'SmallRubyParser.y', 52)
+module_eval(<<'.,.,', 'SmallRubyParser.y', 53)
   def _reduce_24(val, _values, result)
+     result=[:brackets,val[1]]
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'SmallRubyParser.y', 55)
+  def _reduce_25(val, _values, result)
     result = []
     result
   end

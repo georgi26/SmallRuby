@@ -42,4 +42,21 @@ describe SR::Tokenizer do
                     [:NUMBER, 3.14]], result
     end
   end
+  describe "We need to do while loop" do
+    before do
+      @src = "
+      module Test
+        ( T.>(0)).while()
+      end
+      "
+    end
+    it "Must tokenize while loop as send operations  " do
+      result = SR.tokens(@src)
+      assert_equal [["module", "module"],
+                    [:CONST, "Test"], ["(", "("], [:CONST, "T"],
+                    [".", "."], [:CONST, ">"], ["(", "("], [:NUMBER, 0],
+                    [")", ")"], [".", "."], [:CONST, "while"],
+                    ["(", "("], [")", ")"], ["end", "end"]], result
+    end
+  end
 end
