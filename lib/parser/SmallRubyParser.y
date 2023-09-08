@@ -51,7 +51,7 @@ class SR::Parser
             | string
             | CONST
             | '(' exp ')'
-             { result=[:brackets,val[1]]}
+             { result=val[1]}
             |
             {result = []}
              

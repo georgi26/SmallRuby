@@ -14,8 +14,8 @@ module SR
     end
 
     def tokens()
-      rawTokens = @src.split
       @result = []
+      rawTokens = @src.split
       rawTokens.each do |token|
         parseToken(token)
       end
@@ -60,30 +60,72 @@ module SR
       end
     end
 
+    def splitByOperators(token)
+      result = []
+      chars = token.chars
+      index = 0
+      size = token.size
+      current = ""
+      while (index < size)
+        char = chars[index]
+        op = matchOperator(SEND_OPERATORS, char, index, chars)
+        unless op
+          op = matchOperator(OPERATORS, char, index, chars)
+        end
+        if (op)
+          if (current.size > 0)
+            result.push(current)
+            current = ""
+          end
+          result.push(op)
+          index = index + op.size
+        else
+          current.concat(char)
+          index = index + 1
+        end
+      end
+      if (current.size > 0)
+        result.push(current)
+      end
+      result
+    end
+
+    def matchOperator(ops, char, index, chars)
+      ops.each do |op|
+        if (op == char)
+          return op
+        elsif (op.size > 1 && op[0] == char)
+          opChars = concatCharsToOperator(op.size, index, chars)
+          if (op == opChars)
+            return op
+          end
+        end
+      end
+      nil
+    end
+
+    def concatCharsToOperator(size, index, chars)
+      result = ""
+      limit = index + size
+      sizeLimit = chars.size
+      while (index < limit && index < sizeLimit)
+        result.concat(chars[index])
+        index = index + 1
+      end
+      result
+    end
+
     def parseTokenWithOperators(token)
       if (OPERATORS.index(token))
         @result.push([token, token])
         return true
       end
-      OPERATORS.each do |op|
-        if (token.index(op))
-          tokens = token.split(op)
-          if (token.start_with?(op))
-            @result.push([op, op])
-          end
-          tokens.each_with_index do |t, i|
-            if (i > 0)
-              @result.push([op, op])
-            end
-            puts "#{token}---#{op}====#{t}"
-            parseToken(t)
-            puts(@result.join(","))
-          end
-          if (token.end_with?(op))
-            @result.push([op, op])
-          end
-          return true
+      tokens = splitByOperators(token)
+      if (tokens.size > 1)
+        tokens.each do |t|
+          parseToken(t)
         end
+        return true
       end
       return false
     end

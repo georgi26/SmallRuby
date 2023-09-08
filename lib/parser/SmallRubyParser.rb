@@ -312,7 +312,7 @@ module_eval(<<'.,.,', 'SmallRubyParser.y', 40)
 
 module_eval(<<'.,.,', 'SmallRubyParser.y', 53)
   def _reduce_24(val, _values, result)
-     result=[:brackets,val[1]]
+     result=val[1]
     result
   end
 .,.,
