@@ -30,7 +30,7 @@ describe SR::Tokenizer do
 
   describe "When code with Strings and Numbers are given" do
     before do
-      @src = " testStringVar=\"MyString\" testIntVariable=9989 testFloatVariable= 3.14"
+      @src = " testStringVar=\"MyString\" testIntVariable=9989 testFloatVariable=3.14"
     end
     it "must crete String and 2 Number tokens" do
       result = SR.tokens(@src)
