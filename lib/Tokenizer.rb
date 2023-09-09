@@ -15,7 +15,7 @@ module SR
 
     def tokens()
       @result = []
-      rawTokens = @src.split
+      rawTokens = splitByOperators(@src)
       rawTokens.each do |token|
         parseToken(token)
       end
@@ -66,16 +66,38 @@ module SR
       index = 0
       size = token.size
       current = ""
+      sendOperator = false
       while (index < size)
         char = chars[index]
+        if (char == " " || char == "\n" || char == "\t")
+          if (current.size > 0)
+            result.push(current)
+            current = ""
+          end
+          index = index + 1
+          next
+        end
         op = matchOperator(SEND_OPERATORS, char, index, chars)
+        if (op)
+          sendOperator = true
+        else
+          sendOperator = false
+        end
         unless op
           op = matchOperator(OPERATORS, char, index, chars)
+          if (op == "." && current.match(NUMBER_REGEX))
+            current.concat(op)
+            index = index + 1
+            next
+          end
         end
         if (op)
           if (current.size > 0)
             result.push(current)
             current = ""
+          end
+          if (sendOperator && result.last != ".")
+            result.push(".")
           end
           result.push(op)
           index = index + op.size
@@ -118,6 +140,10 @@ module SR
     def parseTokenWithOperators(token)
       if (OPERATORS.index(token))
         @result.push([token, token])
+        return true
+      end
+      if (SEND_OPERATORS.index(token))
+        @result.push([CONST, token])
         return true
       end
       tokens = splitByOperators(token)
