@@ -1,6 +1,6 @@
 module SR
   class Tokenizer
-    KEYWORDS = ["module", "class", "def", "end"]
+    KEYWORDS = ["module", "class", "def", "end", "do"]
     OPERATORS = ["=", ",", "(", ")", "."]
     SEND_OPERATORS = ["==", ">=", "<=", ">", "<", "+", "-", "*", "/"]
     CONST = :CONST

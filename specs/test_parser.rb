@@ -48,7 +48,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
-      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [:send, "x", "hi"]]]], result
+      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [:send, "x", "hi", []]]]], result
     end
   end
 
@@ -83,13 +83,18 @@ describe "SmallParser" do
     before do
       @src = "
       module Test
-         ( T.>(0) ).while
+         ( T > (0) ).while do 
+            T = T - (1) 
+         end
       end
       "
     end
     it "Must parse while loop as send operations  " do
+      puts SR.tokens(@src).join(" ")
       result = SR.parse(@src)
-      assert_equal [:module, "Test", [:send, [:send, "T", ">", [[:number, 0]]], "while"]], result
+      assert_equal [:module, "Test",
+         [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
+          [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
     end
   end
 end
