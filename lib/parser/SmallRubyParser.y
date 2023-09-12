@@ -29,10 +29,18 @@ class SR::Parser
             { result = [:send,val[0],val[2],[]]}
             | exp '.' CONST block
             { result = [:send,val[0],val[2],[],val[3]]}
+            | exp '.' CONST expList
+            { result = [:send,val[0],val[2],val[3]]} 
+            | exp '.' CONST expList block
+            { result = [:send,val[0],val[2],val[3],val[4]]} 
             | exp '.' CONST '('')'
             { result = [:send,val[0],val[2],[]]}
             | exp '.' CONST '(' expList ')'
             { result = [:send,val[0],val[2],val[4]]}
+            | exp '.' CONST '('')' block
+            { result = [:send,val[0],val[2],[],val[5]]}
+            | exp '.' CONST '(' expList ')'  block 
+            { result = [:send,val[0],val[2],val[4],val[6]]}
 
          expList: exp 
                 {result = [val[0]]}

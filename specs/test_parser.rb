@@ -90,11 +90,28 @@ describe "SmallParser" do
       "
     end
     it "Must parse while loop as send operations  " do
-      puts SR.tokens(@src).join(" ")
       result = SR.parse(@src)
       assert_equal [:module, "Test",
-         [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
-          [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
+                    [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
+                     [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
+    end
+  end
+
+  describe "We need to do while loop without brackets on condition and with brackets call" do
+    before do
+      @src = "
+      module Test
+         ( T > 0 ).while() do 
+            T = T - 1 
+         end
+      end
+      "
+    end
+    it "Must parse while loop as send operations  " do
+      result = SR.parse(@src)
+      assert_equal [:module, "Test",
+                    [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
+                     [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
     end
   end
 end
