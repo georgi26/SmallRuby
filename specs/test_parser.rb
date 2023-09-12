@@ -32,7 +32,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside " do
       result = SR.parse(@src)
-      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], []]]], result
+      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [[]]]]], result
     end
   end
   describe "Wen need to parse send expression" do
@@ -48,7 +48,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
-      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [:send, "x", "hi", []]]]], result
+      assert_equal [:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [[:send, "x", "hi", []]]]]], result
     end
   end
 
@@ -93,7 +93,7 @@ describe "SmallParser" do
       result = SR.parse(@src)
       assert_equal [:module, "Test",
                     [:send, [:send, "T", ">", [[:number, 0]]], "if", [],
-                     [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
+                     [:block, [], [[:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]]], result
     end
   end
 
@@ -111,7 +111,32 @@ describe "SmallParser" do
       result = SR.parse(@src)
       assert_equal [:module, "Test",
                     [:send, [:send, "T", ">", [[:number, 0]]], "if", [],
-                     [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
+                     [:block, [], [[:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]]], result
+    end
+  end
+
+  describe "We need to increment X 10 times with while loop" do
+    before do
+      @src = "
+      module Test 
+        def incrementX10Times(x)
+          index = 0 ;
+          while(index < 10)
+            x = x + 1;
+          end;
+         return x
+        end
+      end
+      "
+    end
+    it "Must parse while " do
+      puts SR.tokens(@src).join " "
+      result = SR.parse(@src)
+      assert_equal [:module, "Test", [:def, "incrementX10Times", ["x"],
+                                      [[:assign, "index", [:number, 0]],
+                                       [:while, [:send, "index", "<", [[:number, 10]]],
+                                        [[:assign, "x", [:send, "x", "+", [[:number, 1]]]], []]], [:return, "x"]]]],
+                   result
     end
   end
 end

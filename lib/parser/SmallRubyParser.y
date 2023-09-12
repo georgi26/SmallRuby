@@ -20,42 +20,51 @@ class SR::Parser
                 | argsList ',' CONST 
                 {result.push(val[2])}
         
-        def: 'def' CONST exp 'end'
+        def: 'def' CONST expList 'end'
                     {result = [:def,val[1],[],val[2]]}
-              | 'def' CONST args exp 'end'
+              | 'def' CONST args expList 'end'
                     {result = [:def,val[1],val[2],val[3]]}
+        
+        return: 'return' exp
+            {result = [:return,val[1]]}
         
         send: exp '.' CONST
             { result = [:send,val[0],val[2],[]]}
             | exp '.' CONST block
             { result = [:send,val[0],val[2],[],val[3]]}
-            | exp '.' CONST expList
+            | exp '.' CONST sendExpList
             { result = [:send,val[0],val[2],val[3]]} 
-            | exp '.' CONST expList block
+            | exp '.' CONST sendExpList block
             { result = [:send,val[0],val[2],val[3],val[4]]} 
             | exp '.' CONST '('')'
             { result = [:send,val[0],val[2],[]]}
-            | exp '.' CONST '(' expList ')'
+            | exp '.' CONST '(' sendExpList ')'
             { result = [:send,val[0],val[2],val[4]]}
             | exp '.' CONST '('')' block
             { result = [:send,val[0],val[2],[],val[5]]}
-            | exp '.' CONST '(' expList ')'  block 
+            | exp '.' CONST '(' sendExpList ')'  block 
             { result = [:send,val[0],val[2],val[4],val[6]]}
 
-         expList: exp 
+         sendExpList: exp 
                 {result = [val[0]]}
-                | expList ',' exp
+                | sendExpList ',' exp
                 {result.push(val[2])}
         
         assign: CONST '=' exp
             {result = [:assign,val[0],val[2]]}
         
-        block: 'do' exp 'end'
+        block: 'do' expList 'end'
             {result = [:block,[],val[1]]}
-            | 'do' args exp 'end'
+            | 'do' args expList 'end'
             {result = [:block,val[1],val[2]]}
 
+        while: 'while' '(' exp ')'  expList 'end'
+            {result = [:while,val[2],val[4]]}
        
+        expList: exp 
+            {result = [val[0]]}
+            | expList ';' exp
+            {result.push(val[2])}
         
         exp: module
             | class
@@ -65,6 +74,9 @@ class SR::Parser
             | string
             | CONST
             | assign
+            | while
+            | block
+            | return
             | '(' exp ')'
              { result=val[1]}
             |

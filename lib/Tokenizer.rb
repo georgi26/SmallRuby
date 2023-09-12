@@ -1,7 +1,7 @@
 module SR
   class Tokenizer
-    KEYWORDS = ["module", "class", "def", "end", "do"]
-    OPERATORS = ["=", ",", "(", ")", "."]
+    KEYWORDS = ["module", "class", "def", "end", "do", "while", "break", "return"]
+    OPERATORS = ["=", ",", "(", ")", ".", ";"]
     SEND_OPERATORS = ["==", ">=", "<=", ">", "<", "+", "-", "*", "/"]
     CONST = :CONST
     NUMBER = :NUMBER
