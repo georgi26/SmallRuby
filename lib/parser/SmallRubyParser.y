@@ -1,5 +1,10 @@
 class SR::Parser
     rule
+        expList: exp 
+            {result = [val[0]]}
+            | expList ';' exp
+            {result.push(val[2])}
+
         module: 'module' CONST  exp 'end' 
                     { result = [:module,val[1],val[2]]}
         class: 'class' CONST exp 'end' 
@@ -60,11 +65,6 @@ class SR::Parser
 
         while: 'while' '(' exp ')'  expList 'end'
             {result = [:while,val[2],val[4]]}
-       
-        expList: exp 
-            {result = [val[0]]}
-            | expList ';' exp
-            {result.push(val[2])}
         
         exp: module
             | class
