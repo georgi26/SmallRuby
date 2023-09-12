@@ -79,38 +79,38 @@ describe "SmallParser" do
       assert_equal [:module, "Test", [:send, "x", "hi", ["y", [:string, "Gosh"], [:number, 67]]]], result
     end
   end
-  describe "We need to do while loop" do
+  describe "We need to do if condition" do
     before do
       @src = "
       module Test
-         ( T > (0) ).while do 
+         ( T > (0) ).if do 
             T = T - (1) 
          end
       end
       "
     end
-    it "Must parse while loop as send operations  " do
+    it "Must parse if loop as send operations  " do
       result = SR.parse(@src)
       assert_equal [:module, "Test",
-                    [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
+                    [:send, [:send, "T", ">", [[:number, 0]]], "if", [],
                      [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
     end
   end
 
-  describe "We need to do while loop without brackets on condition and with brackets call" do
+  describe "We need to do if  without brackets on condition and with brackets call" do
     before do
       @src = "
       module Test
-         ( T > 0 ).while() do 
+         ( T > 0 ).if() do 
             T = T - 1 
          end
       end
       "
     end
-    it "Must parse while loop as send operations  " do
+    it "Must parse if as send operations  " do
       result = SR.parse(@src)
       assert_equal [:module, "Test",
-                    [:send, [:send, "T", ">", [[:number, 0]]], "while", [],
+                    [:send, [:send, "T", ">", [[:number, 0]]], "if", [],
                      [:block, [], [:assign, "T", [:send, "T", "-", [[:number, 1]]]]]]], result
     end
   end

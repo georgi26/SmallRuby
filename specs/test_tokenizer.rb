@@ -50,20 +50,20 @@ describe SR::Tokenizer do
     end
   end
 
-  describe "We need to do while loop" do
+  describe "We need to do if " do
     before do
       @src = "
         module Test
-          ( T.>(0)).while()
+          ( T.>(0)).if()
         end
         "
     end
-    it "Must tokenize while loop as send operations  " do
+    it "Must tokenize if as send operations  " do
       result = SR.tokens(@src)
       assert_equal [["module", "module"],
                     [:CONST, "Test"], ["(", "("], [:CONST, "T"],
                     [".", "."], [:CONST, ">"], ["(", "("], [:NUMBER, 0],
-                    [")", ")"], [")", ")"], [".", "."], [:CONST, "while"],
+                    [")", ")"], [")", ")"], [".", "."], [:CONST, "if"],
                     ["(", "("], [")", ")"], ["end", "end"]], result
     end
   end
