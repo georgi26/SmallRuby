@@ -26,9 +26,13 @@ class SR::Parser
                 {result.push(val[2])}
         
         def: 'def' CONST expList 'end'
-                    {result = [:def,val[1],[],val[2]]}
+                    {result = [:def,[],val[1],[],val[2]]}
               | 'def' CONST args expList 'end'
-                    {result = [:def,val[1],val[2],val[3]]}
+                    {result = [:def,[],val[1],val[2],val[3]]}
+              |'def' CONST '.' CONST expList 'end'
+                    {result = [:def,val[1],val[3],[],val[4]]}
+              | 'def' CONST '.' CONST args expList 'end'
+                    {result = [:def,val[1],val[3],val[4],val[5]]}
         
         return: 'return' exp
             {result = [:return,val[1]]}

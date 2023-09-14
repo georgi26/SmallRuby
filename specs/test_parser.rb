@@ -32,7 +32,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside " do
       result = SR.parse(@src)
-      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [[]]]]]], result
+      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, [], "testMethod", ["x", "y"], [[]]]]]], result
     end
   end
   describe "Wen need to parse send expression" do
@@ -48,7 +48,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
-      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, "testMethod", ["x", "y"], [[:send, "x", "hi", []]]]]]], result
+      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, [], "testMethod", ["x", "y"], [[:send, "x", "hi", []]]]]]], result
     end
   end
 
@@ -130,7 +130,7 @@ describe "SmallParser" do
     it "Must parse while " do
       result = SR.parse(@src)
       assert_equal [
-                     [:def, "incrementX10Times", ["x"],
+                     [:def, [], "incrementX10Times", ["x"],
                       [
                        [:assign, "index", [:number, 0]],
                        [:while, [:send, "index", "<", [[:number, 10]]],
@@ -139,6 +139,24 @@ describe "SmallParser" do
                      ]],
                    ],
                    result
+    end
+  end
+
+  describe "We need a way to define class methods" do
+    before do
+      @src = "
+        class ClassWithClassMethods
+          def self.createSubclass(name)
+            res=\"subclass\"
+          end
+        end
+      "
+    end
+    it "Must parse as definition of class method" do
+      result = SR.parse(@src)
+      assert_equal [[:class, "ClassWithClassMethods",
+          [:def, "self", "createSubclass", ["name"],
+           [[:assign, "res", [:string, "subclass"]]]]]], result
     end
   end
 end
