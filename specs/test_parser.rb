@@ -155,8 +155,35 @@ describe "SmallParser" do
     it "Must parse as definition of class method" do
       result = SR.parse(@src)
       assert_equal [[:class, "ClassWithClassMethods",
-          [:def, "self", "createSubclass", ["name"],
-           [[:assign, "res", [:string, "subclass"]]]]]], result
+                     [:def, "self", "createSubclass", ["name"],
+                      [[:assign, "res", [:string, "subclass"]]]]]], result
+    end
+  end
+
+  describe "When we create class Fib with method fib that calculate 26 fibonatchi number" do
+    before do
+      @src = "
+      class Fib
+        def fib(n)
+          (n < 2).ifTrue do
+            return 1
+          end;
+          return (self.fib(n-1)+self.fib(n-2))
+        end
+      end;
+      fib = Fib.new
+      result = fib.fib(26)
+      "
+    end
+    it "Must parse as definition of class method" do
+      result = SR.parse(@src)
+      assert_equal [[:class, "Fib",
+                     [:def, [], "fib", ["n"],
+                      [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]],
+                       [:return,
+                        [:send, "self", "fib", [[:send, [:send, "n", "-",
+                                                         [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]],
+                    [:assign, "fib", [:send, "Fib", "new", [[:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]]]]], result
     end
   end
 end

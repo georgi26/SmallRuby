@@ -18,6 +18,9 @@ module SR
         end.join(",")
         "#{exp1}.send(\"#{messageName}\",[#{args}])"
       },
+      :class => lambda { |exp, context|
+        "SR_KERNEL.defineClass(\"#{exp[1]}\")"
+      },
     }
 
     def initialize(expressions)
