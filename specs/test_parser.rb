@@ -171,7 +171,7 @@ describe "SmallParser" do
           return (self.fib(n-1)+self.fib(n-2))
         end
       end;
-      fib = Fib.new
+      fib = Fib.new;
       result = fib.fib(26)
       "
     end
@@ -183,7 +183,7 @@ describe "SmallParser" do
                        [:return,
                         [:send, "self", "fib", [[:send, [:send, "n", "-",
                                                          [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]],
-                    [:assign, "fib", [:send, "Fib", "new", [[:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]]]]], result
+                    [:assign, "fib", [:send, "Fib", "new", []]], [:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]], result
     end
   end
 end
