@@ -31,6 +31,7 @@ describe SR::JSEmitter do
         "
     end
     it "Must execute as 196418" do
+      puts SR.parse(@src).map { |t| "[#{t}]" }
       result = SR.transpileToJS(@src)
       puts result
       baseJS = SR::JSEmitter.baseJS

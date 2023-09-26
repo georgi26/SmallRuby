@@ -28,7 +28,16 @@ module SR
         "#{exp1}.send(\"#{messageName}\",[#{args}]);"
       },
       :class => lambda { |exp, context|
-        "SR_KERNEL.defineClass(\"#{exp[1]}\");"
+        result = "SR_KERNEL.defineClass(\"#{exp[1]}\");"
+        classContext = JSClassEmitter.new(exp[1], exp[2], context)
+        result << "\n" << classContext.emit
+      },
+      :def => lambda { |exp, context|
+        methodContext = JSDefEmmiter.new(exp[2], exp[4], context)
+        exp[3].each do |arg|
+          methodContext.setLocalVar(arg)
+        end
+        ""
       },
     }
 
@@ -70,9 +79,23 @@ module SR
       end
       handler = EXP_HANDLERS[exp[0]]
       unless handler
-        raise "Expression #{exp} is not supported"
+        raise "Expression #{exp[0]} is not supported(#{exp})"
       end
       handler.call(exp, self)
+    end
+  end
+
+  class JSClassEmitter < JSEmitter
+    def initialize(className, expressions, parent)
+      super(expressions, parent)
+      @className = className
+    end
+  end
+
+  class JSDefEmmiter < JSEmitter
+    def initialize(methodName, expressions, parent)
+      super(expressions, parent)
+      @methodName = methodName
     end
   end
 end

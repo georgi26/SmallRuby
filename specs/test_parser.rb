@@ -22,7 +22,7 @@ describe "SmallParser" do
     end
     it "Has to parse module with class inside " do
       result = SR.parse(@src)
-      assert_equal [[:module, "MyTestModule", [:class, "MyTestClass", []]]], result
+      assert_equal [[:module, "MyTestModule", [:class, "MyTestClass", [[]]]]], result
     end
   end
   describe "Wen need parser for method definition" do
@@ -32,7 +32,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside " do
       result = SR.parse(@src)
-      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, [], "testMethod", ["x", "y"], [[]]]]]], result
+      assert_equal [[:module, "TestModule", [:class, "TestClass", [[:def, [], "testMethod", ["x", "y"], [[]]]]]]], result
     end
   end
   describe "Wen need to parse send expression" do
@@ -48,7 +48,7 @@ describe "SmallParser" do
     end
     it "must parse module with class with method inside and send hi on x " do
       result = SR.parse(@src)
-      assert_equal [[:module, "TestModule", [:class, "TestClass", [:def, [], "testMethod", ["x", "y"], [[:send, "x", "hi", []]]]]]], result
+      assert_equal [[:module, "TestModule", [:class, "TestClass", [[:def, [], "testMethod", ["x", "y"], [[:send, "x", "hi", []]]]]]]], result
     end
   end
 
@@ -155,8 +155,8 @@ describe "SmallParser" do
     it "Must parse as definition of class method" do
       result = SR.parse(@src)
       assert_equal [[:class, "ClassWithClassMethods",
-                     [:def, "self", "createSubclass", ["name"],
-                      [[:assign, "res", [:string, "subclass"]]]]]], result
+                     [[:def, "self", "createSubclass", ["name"],
+                       [[:assign, "res", [:string, "subclass"]]]]]]], result
     end
   end
 
@@ -178,11 +178,11 @@ describe "SmallParser" do
     it "Must parse as definition of class method" do
       result = SR.parse(@src)
       assert_equal [[:class, "Fib",
-                     [:def, [], "fib", ["n"],
-                      [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]],
-                       [:return,
-                        [:send, "self", "fib", [[:send, [:send, "n", "-",
-                                                         [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]],
+                     [[:def, [], "fib", ["n"],
+                       [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]],
+                        [:return,
+                         [:send, "self", "fib", [[:send, [:send, "n", "-",
+                                                          [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]]],
                     [:assign, "fib", [:send, "Fib", "new", []]], [:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]], result
     end
   end

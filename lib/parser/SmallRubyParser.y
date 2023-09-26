@@ -7,7 +7,7 @@ class SR::Parser
 
         module: 'module' CONST  exp 'end' 
                     { result = [:module,val[1],val[2]]}
-        class: 'class' CONST exp 'end' 
+        class: 'class' CONST expList 'end' 
                     { result = [:class,val[1],val[2]]}
         string: STRING 
                 {result = [:string,val[0]]}
