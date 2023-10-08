@@ -16,7 +16,7 @@ module SR
         exp1 = exp[1]
         if (exp1.is_a? Array)
           exp1 = context.transpileExpression(exp1)
-        elsif context.isALocalVar(exp1)
+        elsif exp1 == "self" || context.isALocalVar(exp1)
           exp1 = exp1
         else
           exp1 = "SR_KERNEL.classess.#{exp1}"
@@ -25,7 +25,11 @@ module SR
         args = exp[3].map do |e|
           context.transpileExpression(e)
         end.join(",")
-        "#{exp1}.send(\"#{messageName}\",[#{args}]);"
+        block = "null"
+        if (exp[4] && exp[4].length > 0)
+          block = context.transpileExpression(exp[4])
+        end
+        "#{exp1}.send(\"#{messageName}\",[#{args}],#{block})"
       },
       :class => lambda { |exp, context|
         result = "SR_KERNEL.defineClass(\"#{exp[1]}\");"
@@ -34,10 +38,20 @@ module SR
       },
       :def => lambda { |exp, context|
         methodContext = JSDefEmmiter.new(exp[2], exp[4], context)
-        exp[3].each do |arg|
+        argsJS = ""
+        exp[3].each_with_index do |arg, index|
           methodContext.setLocalVar(arg)
+          argsJS << "let #{arg} = args[#{index}];\n"
         end
-        ""
+        result = "SR_KERNEL.classess[\"#{context.className}\"].addMethod(
+			new SRMethod(\"#{methodContext.methodName}\",#{exp[3].length},function(self,args){
+				#{argsJS}
+				#{methodContext.emit}
+			}))"
+        result
+      },
+      :return => lambda { |exp, context|
+        "return " << context.transpileExpression(exp[1])
       },
     }
 
@@ -68,7 +82,7 @@ module SR
     def emit()
       buffer = ""
       expressions.each do |exp|
-        buffer << transpileExpression(exp)
+        buffer << transpileExpression(exp) << ";\n"
       end
       buffer
     end
@@ -86,6 +100,8 @@ module SR
   end
 
   class JSClassEmitter < JSEmitter
+    attr_reader :className
+
     def initialize(className, expressions, parent)
       super(expressions, parent)
       @className = className
@@ -93,9 +109,15 @@ module SR
   end
 
   class JSDefEmmiter < JSEmitter
+    attr_reader :methodName
+
     def initialize(methodName, expressions, parent)
       super(expressions, parent)
       @methodName = methodName
     end
+  end
+
+  class JSBlockEmmiter < JSEmitter
+    attr_reader :methodName
   end
 end

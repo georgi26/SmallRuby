@@ -7,7 +7,7 @@ describe SR::JSEmitter do
     end
     it "Must be translated to correct JS" do
       result = SR.transpileToJS(@src)
-      assert_equal "let x = new SRIntegerInstance(879).send(\"+\",[new SRIntegerInstance(67)]);", result
+      assert_equal "let x = new SRIntegerInstance(879).send(\"+\",[new SRIntegerInstance(67)],null);\n", result
       baseJS = SR::JSEmitter.baseJS
       baseJS << "\n" << result << "\n console.log(x.variables[\"value\"])"
       output = `echo '#{baseJS}' | node `
@@ -31,7 +31,6 @@ describe SR::JSEmitter do
         "
     end
     it "Must execute as 196418" do
-      puts SR.parse(@src).map { |t| "[#{t}]" }
       result = SR.transpileToJS(@src)
       puts result
       baseJS = SR::JSEmitter.baseJS
