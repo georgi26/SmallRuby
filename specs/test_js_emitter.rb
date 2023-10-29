@@ -32,7 +32,9 @@ describe SR::JSEmitter do
     end
     it "Must execute as 196418" do
       result = SR.transpileToJS(@src)
+      puts "===="
       puts result
+      puts "======"
       baseJS = SR::JSEmitter.baseJS
       baseJS << "\n" << result << "\n console.log(result.variables[\"value\"])"
       output = `echo '#{baseJS}' | node `

@@ -1,6 +1,6 @@
 module SR
   class JSEmitter
-    attr_reader :expressions
+    attr_reader :expressions, :parent
 
     EXP_HANDLERS = {
       :assign => lambda { |exp, context|
@@ -32,26 +32,19 @@ module SR
         "#{exp1}.send(\"#{messageName}\",[#{args}],#{block})"
       },
       :class => lambda { |exp, context|
-        result = "SR_KERNEL.defineClass(\"#{exp[1]}\");"
-        classContext = JSClassEmitter.new(exp[1], exp[2], context)
-        result << "\n" << classContext.emit
+        classContext = JSClassEmitter.new(exp, context)
+        classContext.emit
       },
       :def => lambda { |exp, context|
-        methodContext = JSDefEmmiter.new(exp[2], exp[4], context)
-        argsJS = ""
-        exp[3].each_with_index do |arg, index|
-          methodContext.setLocalVar(arg)
-          argsJS << "let #{arg} = args[#{index}];\n"
-        end
-        result = "SR_KERNEL.classess[\"#{context.className}\"].addMethod(
-			new SRMethod(\"#{methodContext.methodName}\",#{exp[3].length},function(self,args){
-				#{argsJS}
-				#{methodContext.emit}
-			}))"
-        result
+        methodContext = JSDefEmmiter.new(exp, context)
+        methodContext.emit
       },
       :return => lambda { |exp, context|
         "return " << context.transpileExpression(exp[1])
+      },
+      :block => lambda { |exp, context|
+        blockContext = JSBlockEmmiter.new(exp, context)
+        blockContext.emit
       },
     }
 
@@ -102,22 +95,58 @@ module SR
   class JSClassEmitter < JSEmitter
     attr_reader :className
 
-    def initialize(className, expressions, parent)
-      super(expressions, parent)
-      @className = className
+    def initialize(exp, parent)
+      super(exp[2], parent)
+      @className = exp[1]
+    end
+
+    def emit
+      result = "SR_KERNEL.defineClass(\"#{className}\");"
+      result << "\n" << super
+      result
     end
   end
 
   class JSDefEmmiter < JSEmitter
-    attr_reader :methodName
+    attr_reader :methodName, :args
 
-    def initialize(methodName, expressions, parent)
-      super(expressions, parent)
-      @methodName = methodName
+    def initialize(exp, parent)
+      super(exp[4], parent)
+      @methodName = exp[2]
+      @args = exp[3]
+    end
+
+    def emit
+      argsJS = ""
+      args.each_with_index do |arg, index|
+        self.setLocalVar(arg)
+        argsJS << "let #{arg} = args[#{index}];\n"
+      end
+      result = "SR_KERNEL.classess[\"#{parent.className}\"].addMethod(
+    new SRMethod(\"#{methodName}\",#{args.length},function(self,args){
+      #{argsJS}
+      #{super}
+    }))"
+      result
     end
   end
 
   class JSBlockEmmiter < JSEmitter
-    attr_reader :methodName
+    attr_reader :args
+
+    def initialize(exp, parent)
+      super(exp[2], parent)
+      @args = exp[1]
+    end
+
+    def emit
+      argsJS = ""
+      args.each_with_index do |arg, index|
+        self.setLocalVar(arg)
+        argsJS << "let #{arg} = args[#{index}];\n"
+      end
+
+      "()=>{#{super}}"
+    end
   end
 end
