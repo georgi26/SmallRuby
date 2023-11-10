@@ -1,6 +1,6 @@
 module SR
   class JSEmitter
-    attr_reader :expressions, :parent
+    attr_reader :expressions, :parent, :unique
 
     EXP_HANDLERS = {
       :assign => lambda { |exp, context|
@@ -48,10 +48,13 @@ module SR
       },
     }
 
-    def initialize(expressions, parent = nil)
+    def initialize(expressions, parent = nil, unique = 0)
       @expressions = expressions
       @localVars = []
       @parent = parent
+      if (parent)
+        unique = parent.unique
+      end
     end
 
     def isALocalVar(varName)
@@ -83,6 +86,8 @@ module SR
     def transpileExpression(exp)
       if (exp.length == 0)
         return ""
+      elsif (exp.is_a? String)
+        return exp
       end
       handler = EXP_HANDLERS[exp[0]]
       unless handler
@@ -114,6 +119,10 @@ module SR
       super(exp[4], parent)
       @methodName = exp[2]
       @args = exp[3]
+      if (expressions.last[0] != :return)
+        last = expressions.pop
+        expressions.push([:return, last])
+      end
     end
 
     def emit
@@ -146,7 +155,7 @@ module SR
         argsJS << "let #{arg} = args[#{index}];\n"
       end
 
-      "()=>{#{super}}"
+      "new SRBlock(()=>{#{super}})"
     end
   end
 end
