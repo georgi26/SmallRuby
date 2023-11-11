@@ -15,7 +15,7 @@ describe SR::JSEmitter do
     end
   end
 
-  describe "When we Give a method that take " do
+  describe "When we Give a method that take 2 arguments " do
     before do
       @src = "
         class MyClass1
@@ -25,6 +25,30 @@ describe SR::JSEmitter do
         end;
         myClass = MyClass1.new;
         x = myClass.sum(3,6)
+        "
+    end
+    it "Must be translated to correct JS and get correct result" do
+      result = SR.transpileToJS(@src)
+      baseJS = SR::JSEmitter.baseJS
+      baseJS << "\n" << result << "\n console.log(x.variables[\"value\"])"
+      output = `echo '#{baseJS}' | node `
+      assert_equal "9\n", output
+    end
+  end
+
+  describe "When we give a method with block " do
+    before do
+      @src = "
+        class MyClass1
+          def moreThan10(i)
+            (i > 10).ifTrue do 
+              return true
+            end;
+            false
+          end
+        end;
+        myClass = MyClass1.new;
+        x = myClass.moreThan10(20)
         "
     end
     it "Must be translated to correct JS and get correct result" do

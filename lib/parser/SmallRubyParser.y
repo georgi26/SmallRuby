@@ -11,6 +11,9 @@ class SR::Parser
                     { result = [:class,val[1],val[2]]}
         string: STRING 
                 {result = [:string,val[0]]}
+
+        boolean: BOOLEAN 
+                {result = [:boolean,val[0]]}
         
         number: NUMBER
                 {result = [:number,val[0]]}
@@ -76,6 +79,7 @@ class SR::Parser
             | send
             | number
             | string
+            | boolean
             | CONST
             | assign
             | while

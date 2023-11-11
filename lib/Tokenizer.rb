@@ -6,6 +6,7 @@ module SR
     CONST = :CONST
     NUMBER = :NUMBER
     STRING = :STRING
+    BOOLEAN = :BOOLEAN
     NUMBER_REGEX = /^[0-9]+$/
     FLOAT_REGEX = /^[0-9]+\.[0-9]+$/
 
@@ -25,6 +26,8 @@ module SR
     def parseToken(token)
       if (KEYWORDS.index(token))
         @result.push([token, token])
+      elsif (parseBoolean(token))
+        return
       elsif (parseString(token))
         return
       elsif parseNumber(token)
@@ -35,6 +38,15 @@ module SR
         return
       else
         @result.push([CONST, token])
+      end
+    end
+
+    def parseBoolean(token)
+      if (token == "true" || token == "false")
+        @result.push([BOOLEAN, token])
+        return true
+      else
+        return false
       end
     end
 

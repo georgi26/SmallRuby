@@ -12,6 +12,13 @@ module SR
       :number => lambda { |exp, context|
         "new SRIntegerInstance(#{exp[1]})"
       },
+      :boolean => lambda { |exp, context|
+        if (exp[1] == "true")
+          "SR_KERNEL.classess.Boolean.trueInstance"
+        else
+          "SR_KERNEL.classess.Boolean.falseInstance"
+        end
+      },
       :send => lambda { |exp, context|
         exp1 = exp[1]
         if (exp1.is_a? Array)
