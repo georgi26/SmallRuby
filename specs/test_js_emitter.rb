@@ -60,30 +60,33 @@ describe SR::JSEmitter do
     end
   end
 
-  # describe "When we create class Fib with method fib that calculate 26 fibonatchi number" do
-  #   before do
-  #     @src = "
-  #           class Fib
-  #             def fib(n)
-  #               (n < 2).ifTrue do
-  #                 return 1
-  #               end;
-  #               return (self.fib(n-1)+self.fib(n-2))
-  #             end
-  #           end;
-  #           fib = Fib.new;
-  #           result = fib.fib(26);
-  #       "
-  #   end
-  #   it "Must execute as 196418" do
-  #     result = SR.transpileToJS(@src)
-  #     puts "===="
-  #     puts result
-  #     puts "======"
-  #     baseJS = SR::JSEmitter.baseJS
-  #     baseJS << "\n" << result << "\n console.log(result.variables[\"value\"])"
-  #     output = `echo '#{baseJS}' | node `
-  #     assert_equal "196418\n", output
-  #   end
-  # end
+  describe "When we create class Fib with method fib that calculate 26 fibonatchi number" do
+    before do
+      @src = "
+            class Fib
+              def fib(n)
+                (n <= 2).ifTrue do
+                  return 1
+                end;
+                f1 = self.fib(n-1);
+                f2 = self.fib(n-2);
+                r = f1 + f2 ;
+                return r
+              end
+            end;
+            fib = Fib.new;
+            result = fib.fib(20);
+        "
+    end
+    it "Must execute as 196418" do
+      result = SR.transpileToJS(@src)
+      baseJS = SR::JSEmitter.baseJS
+      baseJS << "\n" << result << "\n console.log(result.variables[\"value\"])"
+      puts "===="
+      puts baseJS
+      puts "======"
+      output = `echo '#{baseJS}' | node `
+      assert_equal "6765\n", output
+    end
+  end
 end
