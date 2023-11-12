@@ -7,7 +7,7 @@ describe SR::JSEmitter do
     end
     it "Must be translated to correct JS and get correct result" do
       result = SR.transpileToJS(@src)
-      assert_equal "let x = new SRIntegerInstance(879).send(\"+\",[new SRIntegerInstance(67)],null);\n", result
+      assert_equal "let x = new SRIntegerInstance(879).send(\"+\",[new SRIntegerInstance(67)],null,null);\n", result
       baseJS = SR::JSEmitter.baseJS
       baseJS << "\n" << result << "\n console.log(x.variables[\"value\"])"
       output = `echo '#{baseJS}' | node `
@@ -56,7 +56,7 @@ describe SR::JSEmitter do
       baseJS = SR::JSEmitter.baseJS
       baseJS << "\n" << result << "\n console.log(x.variables[\"value\"])"
       output = `echo '#{baseJS}' | node `
-      assert_equal "9\n", output
+      assert_equal "true\n", output
     end
   end
 

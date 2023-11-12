@@ -20,23 +20,8 @@ module SR
         end
       },
       :send => lambda { |exp, context|
-        exp1 = exp[1]
-        if (exp1.is_a? Array)
-          exp1 = context.transpileExpression(exp1)
-        elsif exp1 == "self" || context.isALocalVar(exp1)
-          exp1 = exp1
-        else
-          exp1 = "SR_KERNEL.classess.#{exp1}"
-        end
-        messageName = exp[2]
-        args = exp[3].map do |e|
-          context.transpileExpression(e)
-        end.join(",")
-        block = "null"
-        if (exp[4] && exp[4].length > 0)
-          block = context.transpileExpression(exp[4])
-        end
-        "#{exp1}.send(\"#{messageName}\",[#{args}],#{block})"
+        sendContext = JSSendEmmiter.new(exp, context)
+        sendContext.emit
       },
       :class => lambda { |exp, context|
         classContext = JSClassEmitter.new(exp, context)
@@ -132,6 +117,15 @@ module SR
       end
     end
 
+    def emitCheckForReturn()
+      buffer = ""
+      expressions.each do |exp|
+        buffer << transpileExpression(exp) << ";\n"
+        buffer << "if(methodContext && methodContext.return){return methodContext.returnValue}"
+      end
+      buffer
+    end
+
     def emit
       argsJS = ""
       args.each_with_index do |arg, index|
@@ -139,9 +133,9 @@ module SR
         argsJS << "let #{arg} = args[#{index}];\n"
       end
       result = "SR_KERNEL.classess[\"#{parent.className}\"].addMethod(
-    new SRMethod(\"#{methodName}\",#{args.length},function(self,args){
+    new SRMethod(\"#{methodName}\",#{args.length},function(self,args,block,methodContext){
       #{argsJS}
-      #{super}
+      #{emitCheckForReturn}
     }))"
       result
     end
@@ -155,6 +149,17 @@ module SR
       @args = exp[1]
     end
 
+    def transpileExpression(exp)
+      if (exp.is_a?(Array) && exp[0] == :return)
+        returnJS = "methodContext.returnValue = #{self.transpileExpression(exp[1])}\n"
+        returnJS << "methodContext.return = true\n"
+        returnJS << "return"
+        returnJS
+      else
+        super(exp)
+      end
+    end
+
     def emit
       argsJS = ""
       args.each_with_index do |arg, index|
@@ -163,6 +168,54 @@ module SR
       end
 
       "new SRBlock(()=>{#{super}})"
+    end
+  end
+
+  class JSSendEmmiter < JSEmitter
+    def initialize(exp, parent)
+      super([], parent)
+      @caller = exp[1]
+      @methodName = exp[2]
+      @args = exp[3]
+      @block = exp[4]
+    end
+
+    def isInMethod()
+      hasMethod = false
+      currentParent = parent
+      while (!hasMethod && currentParent)
+        if (currentParent.is_a? JSDefEmmiter)
+          hasMethod = true
+          return hasMethod
+        else
+          currentParent = currentParent.parent
+        end
+      end
+      hasMethod
+    end
+
+    def emit
+      callerJS = ""
+      if (@caller.is_a? Array)
+        callerJS = self.transpileExpression(@caller)
+      elsif @caller == "self" || self.isALocalVar(@caller)
+        callerJS = @caller
+      else
+        callerJS = "SR_KERNEL.classess.#{@caller}"
+      end
+      argsJS = @args.map do |e|
+        self.transpileExpression(e)
+      end.join(",")
+      blockJS = "null"
+      if (@block && @block.length > 0)
+        blockJS = self.transpileExpression(@block)
+      end
+      methodContextJS = "null"
+      if (isInMethod)
+        methodContextJS = "methodContext"
+      end
+
+      "#{callerJS}.send(\"#{@methodName}\",[#{argsJS}],#{blockJS},#{methodContextJS})"
     end
   end
 end
