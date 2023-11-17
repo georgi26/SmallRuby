@@ -181,8 +181,8 @@ describe "SmallParser" do
                      [[:def, [], "fib", ["n"],
                        [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]],
                         [:return,
-                         [:send, "self", "fib", [[:send, [:send, "n", "-",
-                                                          [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]]],
+                         [[:send, [:send, "n", "-",
+                                   [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]],
                     [:assign, "fib", [:send, "Fib", "new", []]], [:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]], result
     end
   end

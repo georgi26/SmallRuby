@@ -1,92 +1,5 @@
 module SR
   class JSEmitter
-    attr_reader :expressions, :parent, :unique
-
-    EXP_HANDLERS = {
-      :assign => lambda { |exp, context|
-        trans = context.transpileExpression(exp[2])
-        localVar = exp[1]
-        context.setLocalVar(localVar)
-        "let #{localVar} = #{trans}"
-      },
-      :number => lambda { |exp, context|
-        "new SRIntegerInstance(#{exp[1]})"
-      },
-      :boolean => lambda { |exp, context|
-        if (exp[1] == "true")
-          "SR_KERNEL.classess.Boolean.trueInstance"
-        else
-          "SR_KERNEL.classess.Boolean.falseInstance"
-        end
-      },
-      :send => lambda { |exp, context|
-        sendContext = JSSendEmmiter.new(exp, context)
-        sendContext.emit
-      },
-      :class => lambda { |exp, context|
-        classContext = JSClassEmitter.new(exp, context)
-        classContext.emit
-      },
-      :def => lambda { |exp, context|
-        methodContext = JSDefEmmiter.new(exp, context)
-        methodContext.emit
-      },
-      :return => lambda { |exp, context|
-        "return " << context.transpileExpression(exp[1])
-      },
-      :block => lambda { |exp, context|
-        blockContext = JSBlockEmmiter.new(exp, context)
-        blockContext.emit
-      },
-    }
-
-    def initialize(expressions, parent = nil, unique = 0)
-      @expressions = expressions
-      @localVars = []
-      @parent = parent
-      if (parent)
-        unique = parent.unique
-      end
-    end
-
-    def isALocalVar(varName)
-      found = @localVars.index(varName)
-      if (!found && @parent)
-        found = @parent.isALocalVar(varName)
-      end
-      found
-    end
-
-    def setLocalVar(name)
-      if (!isALocalVar(name))
-        @localVars.push(name)
-      end
-    end
-
-    def self.baseJS
-      File.read("#{__dir__}/smallruby.js")
-    end
-
-    def emit()
-      buffer = ""
-      expressions.each do |exp|
-        buffer << transpileExpression(exp) << ";\n"
-      end
-      buffer
-    end
-
-    def transpileExpression(exp)
-      if (exp.length == 0)
-        return ""
-      elsif (exp.is_a? String)
-        return exp
-      end
-      handler = EXP_HANDLERS[exp[0]]
-      unless handler
-        raise "Expression #{exp[0]} is not supported(#{exp})"
-      end
-      handler.call(exp, self)
-    end
   end
 
   class JSClassEmitter < JSEmitter
@@ -121,7 +34,9 @@ module SR
       buffer = ""
       expressions.each do |exp|
         buffer << transpileExpression(exp) << ";\n"
-        buffer << "if(methodContext && methodContext.return){return methodContext.returnValue}"
+        if (exp.is_a?(Array) && exp[0] != :return)
+          buffer << "if(methodContext && methodContext.return){\nreturn methodContext.returnValue\n}\n"
+        end
       end
       buffer
     end
@@ -211,11 +126,98 @@ module SR
         blockJS = self.transpileExpression(@block)
       end
       methodContextJS = "null"
-      if (isInMethod)
+      if (isInMethod && @block && @block.length > 0)
         methodContextJS = "methodContext"
       end
 
       "#{callerJS}.send(\"#{@methodName}\",[#{argsJS}],#{blockJS},#{methodContextJS})"
+    end
+  end
+
+  class JSEmitter
+    attr_reader :expressions, :parent, :unique
+
+    EXP_HANDLERS = {
+      :assign => lambda { |exp, context|
+        trans = context.transpileExpression(exp[2])
+        localVar = exp[1]
+        context.setLocalVar(localVar)
+        "let #{localVar} = #{trans}"
+      },
+      :number => lambda { |exp, context|
+        "new SRIntegerInstance(#{exp[1]})"
+      },
+      :boolean => lambda { |exp, context|
+        if (exp[1] == "true")
+          "SR_KERNEL.classess.Boolean.trueInstance"
+        else
+          "SR_KERNEL.classess.Boolean.falseInstance"
+        end
+      },
+      :send => JSSendEmmiter,
+      :class => JSClassEmitter,
+      :def => JSDefEmmiter,
+      :return => lambda { |exp, context|
+        "return " << context.transpileExpression(exp[1])
+      },
+      :block => JSBlockEmmiter,
+    }
+
+    def initialize(expressions, parent = nil, unique = 0)
+      @expressions = expressions
+      @localVars = []
+      @parent = parent
+      if (parent)
+        unique = parent.unique
+      end
+    end
+
+    def isALocalVar(varName)
+      found = @localVars.index(varName)
+      if (!found && @parent)
+        found = @parent.isALocalVar(varName)
+      end
+      found
+    end
+
+    def setLocalVar(name)
+      if (!isALocalVar(name))
+        @localVars.push(name)
+      end
+    end
+
+    def self.baseJS
+      File.read("#{__dir__}/smallruby.js")
+    end
+
+    def emit()
+      buffer = ""
+      expressions.each do |exp|
+        buffer << transpileExpression(exp) << ";\n"
+      end
+      buffer
+    end
+
+    def transpileExpression(exp)
+      if (exp.length == 0)
+        return ""
+      elsif (exp.is_a? String)
+        return exp
+      end
+      handler = EXP_HANDLERS[exp[0]]
+      unless handler
+        raise "Expression #{exp[0]} is not supported(#{exp})"
+      end
+      if (handler.respond_to?(:"<=") && handler <= JSEmitter)
+        handlerInstance = handler.new(exp, self)
+        handlerInstance.emit
+      else
+        handler.call(exp, self)
+      end
+    end
+
+    def findExpresionHandler(keyWord)
+      handler = EXP_HANDLERS[keyWord]
     end
   end
 end
