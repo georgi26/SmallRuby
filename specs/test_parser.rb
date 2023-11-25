@@ -83,7 +83,7 @@ describe "SmallParser" do
     before do
       @src = "
       module Test
-         ( T > (0) ).if do 
+         (T >(0)).if() do 
             T = T - (1) 
          end
       end
@@ -101,8 +101,8 @@ describe "SmallParser" do
     before do
       @src = "
       module Test
-         ( T > 0 ).if() do 
-            T = T - 1 
+         ( T > (0) ).if() do 
+            T = T-(1) 
          end
       end
       "
@@ -120,8 +120,8 @@ describe "SmallParser" do
       @src = "
         def incrementX10Times(x)
           index = 0 ;
-          while(index < 10)
-            x = x + 1
+          while(index < (10))
+            x = x +(1)
           end;
          return x
         end
@@ -160,15 +160,31 @@ describe "SmallParser" do
     end
   end
 
+  describe "When we have chained methods" do
+    before do
+      @src = "self.fib(n.-(1)).+(self.fib(n.-(2)))"
+    end
+    it "Must parse correctly " do
+      result = SR.parse(@src)
+      assert_equal [[:send,
+                     [:send, "self", "fib",
+                      [[:send, "n", "-", [[:number, 1]]]]], "+", [
+                     [:send, "self", "fib",
+                      [[:send, "n", "-", [[:number, 2]]]]],
+                   ]]], result
+    end
+  end
+
   describe "When we create class Fib with method fib that calculate 26 fibonatchi number" do
     before do
       @src = "
       class Fib
         def fib(n)
-          (n < 2).ifTrue do
+          n.<(2).ifTrue() do
             return 1
-          end;
-          return (self.fib(n-1)+self.fib(n-2))
+          end
+          ;
+          return self.fib(n.-(1)).+(self.fib(n.-(2)))
         end
       end;
       fib = Fib.new;
@@ -177,13 +193,8 @@ describe "SmallParser" do
     end
     it "Must parse as definition of class method" do
       result = SR.parse(@src)
-      assert_equal [[:class, "Fib",
-                     [[:def, [], "fib", ["n"],
-                       [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]],
-                        [:return,
-                         [[:send, [:send, "n", "-",
-                                   [[:number, 1]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]]],
-                    [:assign, "fib", [:send, "Fib", "new", []]], [:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]], result
+      assert_equal [[:class, "Fib", [[:def, [], "fib", ["n"], [[:send, [:send, "n", "<", [[:number, 2]]], "ifTrue", [], [:block, [], [[:return, [:number, 1]]]]], [:return, [:send, [:send, "self", "fib", [[:send, "n", "-", [[:number, 1]]]]], "+", [[:send, "self", "fib", [[:send, "n", "-", [[:number, 2]]]]]]]]]]]], [:assign, "fib", [:send, "Fib", "new", []]], [:assign, "result", [:send, "fib", "fib", [[:number, 26]]]]],
+                   result
     end
   end
 end
